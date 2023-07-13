@@ -1,6 +1,7 @@
 
 let totalCost = 0;
     const cartItems = {};
+
     const incrementCounter = (event) => {
         const counter = event.target.parentNode.querySelector('.counter');
         let value = parseInt(counter.textContent);
@@ -20,8 +21,7 @@ let totalCost = 0;
 
         const item = event.target.parentNode.parentNode.querySelector('.fruit-name').textContent;
         const quantity = parseInt(event.target.parentNode.querySelector('.counter').textContent);
-        const price = parseInt(event.target.parentNode.parentNode.querySelector('.price span').textContent);
-
+        const price = parseInt(event.target.parentNode.parentNode.querySelector('.price-value').textContent);
         if (cartItems.hasOwnProperty(item)) {
             cartItems[item].quantity += quantity;
         } else {
@@ -37,8 +37,9 @@ let totalCost = 0;
 
     const updateTotalCost = (cost) => {
         totalCost += cost;
+
         const totalCostElement = document.getElementById('total-cost');
-        totalCostElement.textContent = `Total: ${totalCost.toFixed(2)}`;
+        totalCostElement.textContent = `Total: ${totalCost.toFixed(2)} KES`;
     };
 
     const renderCartItems = () => {
@@ -48,11 +49,33 @@ let totalCost = 0;
         for (const item in cartItems) {
             if (cartItems.hasOwnProperty(item)) {
                 const { quantity, price } = cartItems[item];
+
                 const cartItem = document.createElement('div');
                 cartItem.textContent = `${item} (Qty: ${quantity})`;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => removeCartItem(item));
+
+                cartItem.appendChild(deleteButton);
                 cartItemsList.appendChild(cartItem);
             }
         }
+    };
+
+    const removeCartItem = (item) => {
+        const { quantity, price } = cartItems[item];
+        const cost = quantity * price;
+        delete cartItems[item];
+        updateTotalCost(-cost);
+        renderCartItems();
+    };
+
+    const clearCart = () => {
+        cartItems = {};
+        totalCost = 0;
+        renderCartItems();
+        updateTotalCost(0);
     };
 
     const toggleCart = () => {
@@ -93,7 +116,7 @@ let totalCost = 0;
         <div class="content">
           <h3 class="fruit-name">${items.name}</h3>
           <div class="price">
-          <p><span>price: </span>${items.price}</p>
+          <p class="price-value">${items.price}</p>
           <p class="qty">
               <span>QTY:</span>
               <button onclick="decrementCounter(event)">-</button>
